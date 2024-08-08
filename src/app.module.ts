@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { GqlConfigService } from 'config/graphql/gql-config.service';
 import { AppResolver } from './app.resolver';
+import { GqlConfigService } from './config/graphql/gql.config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeormConfigService } from './config/typeorm/typeorm.config';
 
 @Module({
     imports: [
@@ -12,8 +13,10 @@ import { AppResolver } from './app.resolver';
             driver: ApolloDriver,
             useClass: GqlConfigService,
         }),
+        TypeOrmModule.forRootAsync({
+            useClass: TypeormConfigService,
+        }),
     ],
-    controllers: [AppController],
     providers: [AppService, AppResolver],
 })
 export class AppModule {}
