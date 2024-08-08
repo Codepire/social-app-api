@@ -9,7 +9,7 @@ const dataSource = new DataSource({
     database: 'social-app',
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     synchronize: false,
-    migrations: [],
+    migrations: [__dirname + '/migrations/*.{ts,js}'],
 });
 
 console.log(__dirname);
