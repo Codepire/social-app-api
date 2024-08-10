@@ -7,6 +7,7 @@ import { GqlConfigService } from './config/graphql/gql.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeormConfigService } from './config/typeorm/typeorm.config';
 import { ConfigModule } from '@nestjs/config';
+import { UserModule } from './user/user.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -19,6 +20,7 @@ import configuration from './config/configuration';
             useClass: TypeormConfigService,
         }),
         ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
+        UserModule,
     ],
     providers: [AppService, AppResolver],
 })
