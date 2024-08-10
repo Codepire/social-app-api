@@ -1,15 +1,17 @@
+import { ApolloDriverConfig } from '@nestjs/apollo';
 import { Injectable } from '@nestjs/common';
-import { GqlModuleOptions, GqlOptionsFactory } from '@nestjs/graphql';
+import { GqlOptionsFactory } from '@nestjs/graphql';
 import { join } from 'path';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
 @Injectable()
 export class GqlConfigService implements GqlOptionsFactory {
-    createGqlOptions():
-        | Omit<GqlModuleOptions<any>, 'driver'>
-        | Promise<Omit<GqlModuleOptions<any>, 'driver'>> {
+    createGqlOptions(): ApolloDriverConfig {
         return {
             autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
             sortSchema: true,
+            playground: false,
+            plugins: [ApolloServerPluginLandingPageLocalDefault()],
         };
     }
 }
