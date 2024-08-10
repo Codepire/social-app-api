@@ -3,5 +3,16 @@
 # ------------------------------------------------------
 
 type Query {
+  findUser(username: String!): UserEntity!
   getHello: String!
+}
+
+type UserEntity {
+  bio: String!
+  email: String!
+  gender: String!
+  id: String!
+  mobile_no: String!
+  profile_url: String!
+  username: String!
 }
