@@ -8,6 +8,8 @@ import { JwtConfigService } from 'src/config/jwt/jwt.config';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from 'src/user/entity/user.entity';
 
 @Module({
     imports: [
@@ -15,6 +17,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
         JwtModule.registerAsync({
             useClass: JwtConfigService,
         }),
+        TypeOrmModule.forFeature([UserEntity]),
     ],
     providers: [
         AuthResolver,

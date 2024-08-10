@@ -1,4 +1,4 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { UseGuards } from '@nestjs/common';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
@@ -7,6 +7,8 @@ import { LoginUserInput } from './dtos/login-user.input';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginUserOutput } from './dtos/login-user.output';
 import { SkipAuth } from 'src/common/decorators/skip-auth.decorator';
+import { RegisterUserInput } from './dtos/register-user.input';
+import { GenericResult } from 'src/common/generic.result';
 
 @Resolver()
 export class AuthResolver {
@@ -21,5 +23,11 @@ export class AuthResolver {
         @Args('object') _: LoginUserInput,
     ) {
         return this.authService.login(user);
+    }
+
+    @SkipAuth()
+    @Mutation(() => GenericResult)
+    async register(@Args('object') registerUserInput: RegisterUserInput) {
+        return this.authService.register(registerUserInput);
     }
 }

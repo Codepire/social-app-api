@@ -7,6 +7,9 @@ export class TypeormConfigService implements TypeOrmOptionsFactory {
     createTypeOrmOptions():
         | Promise<TypeOrmModuleOptions>
         | TypeOrmModuleOptions {
-        return { ...dataSource?.options } as TypeOrmModuleOptions;
+        return {
+            logging: true,
+            ...dataSource?.options,
+        } as TypeOrmModuleOptions;
     }
 }

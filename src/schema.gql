@@ -2,6 +2,10 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type GenericResult {
+  message: String!
+}
+
 input LoginUserInput {
   password: String!
   username: String!
@@ -11,7 +15,29 @@ type LoginUserOutput {
   access_token: String!
 }
 
+type Mutation {
+  register(object: RegisterUserInput!): GenericResult!
+}
+
 type Query {
   getHello: String!
   login(object: LoginUserInput!): LoginUserOutput!
+}
+
+input RegisterUserInput {
+  bio: String
+  email: String!
+  gender: gender_enum
+  mobile_no: String!
+  password: String!
+
+  """S3 or any other provider's picture url"""
+  profile_url: String
+  username: String!
+}
+
+enum gender_enum {
+  FEMALE
+  MALE
+  OTHER
 }

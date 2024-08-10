@@ -3,12 +3,12 @@ import { TimeStampedCommonEntities } from 'src/common/entities';
 import { gender_enum } from 'src/common/enums';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@ObjectType()
+@ObjectType('user')
 @Entity({ name: 'users' })
 export class UserEntity extends TimeStampedCommonEntities {
     @Field()
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    id?: string;
 
     @Field()
     @Column({ type: 'varchar', length: 30, unique: true })
@@ -21,19 +21,22 @@ export class UserEntity extends TimeStampedCommonEntities {
     @Column({ type: 'varchar', length: 300 })
     password: string;
 
-    @Field()
-    @Column({ type: 'varchar', length: 150 })
-    bio: string;
+    @Field({ nullable: true })
+    @Column({ type: 'varchar', length: 150, nullable: true })
+    bio?: string;
 
-    @Field()
-    @Column({ type: 'varchar', length: 200, unique: true, default: 'Some url' })
-    profile_url: string;
+    @Field({ nullable: true })
+    @Column({ type: 'varchar', length: 200, unique: true, nullable: true })
+    profile_url?: string;
 
-    @Field()
+    @Field({ nullable: true })
     @Column({ type: 'enum', enum: gender_enum, default: gender_enum.MALE })
-    gender: gender_enum;
+    gender?: gender_enum;
 
     @Field()
     @Column({ type: 'varchar', length: 10 })
     mobile_no: string;
+
+    @Column({ type: 'boolean', default: false })
+    verified?: boolean;
 }
