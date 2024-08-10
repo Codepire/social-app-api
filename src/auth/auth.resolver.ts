@@ -6,8 +6,6 @@ import { UserEntity } from 'src/user/entity/user.entity';
 import { LoginUserInput } from './dtos/login-user.input';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginUserOutput } from './dtos/login-user.output';
-import { AuthGuard } from '@nestjs/passport';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { SkipAuth } from 'src/common/decorators/skip-auth.decorator';
 
 @Resolver()
@@ -19,6 +17,7 @@ export class AuthResolver {
     @Query(() => LoginUserOutput)
     async login(
         @CurrentUser() user: UserEntity,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         @Args('object') _: LoginUserInput,
     ) {
         return await this.authService.login(user);
