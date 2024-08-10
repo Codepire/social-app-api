@@ -20,6 +20,6 @@ export class AuthResolver {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         @Args('object') _: LoginUserInput,
     ) {
-        return await this.authService.login(user);
+        return this.authService.login(user);
     }
 }
