@@ -13,7 +13,5 @@ const dataSource = new DataSource({
     migrations: [__dirname + '/migrations/*.{ts,js}'],
 } as DataSourceOptions);
 
-console.log(__dirname);
-
 dataSource.initialize();
 export default dataSource;

@@ -2,9 +2,19 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input LoginUserInput {
+  password: String!
+  username: String!
+}
+
+type LoginUserOutput {
+  access_token: String!
+}
+
 type Query {
   findUser(username: String!): UserEntity!
   getHello: String!
+  login(object: LoginUserInput!): LoginUserOutput!
 }
 
 type UserEntity {

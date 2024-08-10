@@ -1,14 +1,26 @@
-import { Resolver } from '@nestjs/graphql';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
-import { Request, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { UserEntity } from 'src/user/entity/user.entity';
+import { LoginUserInput } from './dtos/login-user.input';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { LoginUserOutput } from './dtos/login-user.output';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { SkipAuth } from 'src/common/decorators/skip-auth.decorator';
 
 @Resolver()
 export class AuthResolver {
     constructor(private readonly authService: AuthService) {}
 
-    @UseGuards(AuthGuard('local'))
-    async login(@Request() req) {
-        return req.user;
+    @SkipAuth()
+    @UseGuards(LocalAuthGuard)
+    @Query(() => LoginUserOutput)
+    async login(
+        @CurrentUser() user: UserEntity,
+        @Args('object') _: LoginUserInput,
+    ) {
+        return await this.authService.login(user);
     }
 }
