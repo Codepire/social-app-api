@@ -21,6 +21,9 @@ export class UserEntity extends TimeStampedCommonEntities {
     @Column({ type: 'varchar', length: 300 })
     password: string;
 
+    @Column({ type: 'varchar', length: 40, nullable: true })
+    salt: string;
+
     @Field({ nullable: true })
     @Column({ type: 'varchar', length: 150, nullable: true })
     bio?: string;

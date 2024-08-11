@@ -10,10 +10,13 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entity/user.entity';
+import { Cryptography } from 'src/common/utils/cryptography';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
     imports: [
         UserModule,
+        MailModule,
         JwtModule.registerAsync({
             useClass: JwtConfigService,
         }),
@@ -21,6 +24,7 @@ import { UserEntity } from 'src/user/entity/user.entity';
     ],
     providers: [
         AuthResolver,
+        Cryptography,
         AuthService,
         LocalStrategy,
         JwtStrategy,

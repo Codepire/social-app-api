@@ -9,6 +9,7 @@ import { LoginUserOutput } from './dtos/login-user.output';
 import { SkipAuth } from 'src/common/decorators/skip-auth.decorator';
 import { RegisterUserInput } from './dtos/register-user.input';
 import { GenericResult } from 'src/common/generic.result';
+import { generateOTP } from 'src/common/utils/generate-otp';
 
 @Resolver()
 export class AuthResolver {
@@ -28,6 +29,18 @@ export class AuthResolver {
     @SkipAuth()
     @Mutation(() => GenericResult)
     async register(@Args('object') registerUserInput: RegisterUserInput) {
-        return this.authService.register(registerUserInput);
+        const [otp] = await Promise.all([
+            generateOTP(),
+            this.authService.register(registerUserInput),
+        ]);
+        console.log(otp);
+        // await this.mailService.sendMail({
+        //     context: { otp },
+        //     type: 'REGISTER_OTP',
+        //     to: registerUserInput.email,
+        // });
+        return {
+            message: 'registered successfully',
+        };
     }
 }

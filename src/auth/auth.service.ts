@@ -5,16 +5,29 @@ import { Repository } from 'typeorm';
 import { RegisterUserInput } from './dtos/register-user.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CONSTANTS } from 'src/common/constants';
+import { Cryptography } from 'src/common/utils/cryptography';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly jwtService: JwtService,
 
+        /* Custom services */
+        private readonly cryptography: Cryptography,
+
+        /* Repositories */
         @InjectRepository(UserEntity)
         private readonly usersRepo: Repository<UserEntity>,
     ) {}
 
+    /**
+     * @description validates a user by checking their username and password.
+     * (used in local strategy callback)
+     *
+     * @param {string} username
+     * @param {string} password
+     * @returns {Promise<UserEntity | null>}
+     */
     async validateUser(
         username: string,
         password: string,
@@ -22,7 +35,14 @@ export class AuthService {
         const user = await this.usersRepo.findOne({
             where: { username, deleted_at: null, verified: true },
         });
-        if (user && user.password === password) {
+        if (
+            user &&
+            (await this.cryptography.compare({
+                plainText: password,
+                hash: user.password,
+                salt: user.salt,
+            }))
+        ) {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { password, ...result } = user;
             return result as UserEntity;
@@ -52,9 +72,13 @@ export class AuthService {
             };
         }
 
-        await this.usersRepo.insert(registerUserInput);
-        return {
-            message: 'registered successfully',
-        };
+        const { hash, salt } = await this.cryptography.hash({
+            plainText: registerUserInput.password,
+        });
+        await this.usersRepo.insert({
+            ...registerUserInput,
+            password: hash,
+            salt,
+        });
     }
 }
