@@ -2,7 +2,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { UseGuards } from '@nestjs/common';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
-import { UserEntity } from 'src/user/entity/user.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 import { LoginUserInput } from './dtos/login-user.input';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginUserOutput } from './dtos/login-user.output';
@@ -10,6 +10,8 @@ import { SkipAuth } from 'src/common/decorators/skip-auth.decorator';
 import { RegisterUserInput } from './dtos/register-user.input';
 import { GenericResult } from 'src/common/generic.result';
 import { generateOTP } from 'src/common/utils/generate-otp';
+import { ValidateOtpInput } from './dtos/validate-otp.input';
+import { otp_types_enum } from 'src/common/enums';
 
 @Resolver()
 export class AuthResolver {
@@ -29,11 +31,11 @@ export class AuthResolver {
     @SkipAuth()
     @Mutation(() => GenericResult)
     async register(@Args('object') registerUserInput: RegisterUserInput) {
-        const [otp] = await Promise.all([
-            generateOTP(),
-            this.authService.register(registerUserInput),
-        ]);
-        console.log(otp);
+        const otp = await generateOTP();
+        await this.authService.register({
+            otp,
+            registerUserInput,
+        });
         // await this.mailService.sendMail({
         //     context: { otp },
         //     type: 'REGISTER_OTP',
@@ -42,5 +44,13 @@ export class AuthResolver {
         return {
             message: 'registered successfully',
         };
+    }
+
+    @SkipAuth()
+    @Mutation(() => String)
+    async validateOtp(@Args('object') validateOtpInput: ValidateOtpInput) {
+        if (validateOtpInput.otp_type === otp_types_enum.SIGN_UP) {
+            return await this.authService.activateAccount(validateOtpInput);
+        }
     }
 }

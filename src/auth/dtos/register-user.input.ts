@@ -1,7 +1,7 @@
 import { Field, InputType, PartialType } from '@nestjs/graphql';
 import { IsEmail, IsNotEmpty, IsPhoneNumber } from 'class-validator';
 import { gender_enum } from 'src/common/enums';
-import { UserEntity } from 'src/user/entity/user.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 
 @InputType()
 export class RegisterUserInput extends PartialType(UserEntity) {

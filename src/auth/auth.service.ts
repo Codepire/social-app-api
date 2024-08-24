@@ -1,16 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserEntity } from 'src/user/entity/user.entity';
-import { Repository } from 'typeorm';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { DataSource, Repository } from 'typeorm';
 import { RegisterUserInput } from './dtos/register-user.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CONSTANTS } from 'src/common/constants';
 import { Cryptography } from 'src/common/utils/cryptography';
+import { ValidateOtpInput } from './dtos/validate-otp.input';
+import { OtpEntity } from 'src/user/entities/otp.entity';
+import { otp_types_enum } from 'src/common/enums';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly jwtService: JwtService,
+        private readonly dataSource: DataSource,
 
         /* Custom services */
         private readonly cryptography: Cryptography,
@@ -18,6 +22,9 @@ export class AuthService {
         /* Repositories */
         @InjectRepository(UserEntity)
         private readonly usersRepo: Repository<UserEntity>,
+
+        @InjectRepository(OtpEntity)
+        private readonly otpsRepo: Repository<OtpEntity>,
     ) {}
 
     /**
@@ -58,7 +65,13 @@ export class AuthService {
         };
     }
 
-    async register(registerUserInput: RegisterUserInput) {
+    async register({
+        registerUserInput,
+        otp,
+    }: {
+        registerUserInput: RegisterUserInput;
+        otp: string;
+    }) {
         const foundUser = await this.usersRepo.findOne({
             where: [
                 { username: registerUserInput.username },
@@ -75,10 +88,45 @@ export class AuthService {
         const { hash, salt } = await this.cryptography.hash({
             plainText: registerUserInput.password,
         });
-        await this.usersRepo.insert({
+        const newUser = this.usersRepo.create({
             ...registerUserInput,
             password: hash,
             salt,
         });
+
+        await this.usersRepo.save(newUser);
+        await this.otpsRepo.save({
+            user: newUser,
+            otp,
+            otp_type: otp_types_enum.SIGN_UP,
+        });
+    }
+
+    async activateAccount(validateOtpInput: ValidateOtpInput) {
+        try {
+            const foundUser: UserEntity = await this.usersRepo.findOne({
+                where: {
+                    id: validateOtpInput.user_id,
+                },
+            });
+            if (!foundUser) {
+                throw new Error(CONSTANTS.USER_NOT_EXIST);
+            }
+            await this.dataSource.manager.transaction(async (transaction) => {
+                await transaction.delete(OtpEntity, {
+                    otp: validateOtpInput.otp,
+                    otp_type: validateOtpInput.otp_type,
+                    user: foundUser,
+                });
+                await transaction.update(
+                    UserEntity,
+                    { id: foundUser.id },
+                    { verified: true },
+                );
+            });
+            return 'Account activated successfully';
+        } catch (error) {
+            throw error;
+        }
     }
 }

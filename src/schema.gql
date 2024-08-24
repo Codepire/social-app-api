@@ -17,6 +17,7 @@ type LoginUserOutput {
 
 type Mutation {
   register(object: RegisterUserInput!): GenericResult!
+  validateOtp(object: ValidateOtpInput!): String!
 }
 
 type Query {
@@ -36,8 +37,28 @@ input RegisterUserInput {
   username: String!
 }
 
+input ValidateOtpInput {
+  otp: String!
+  otp_type: otp_types_enum!
+  user_id: String!
+}
+
 enum gender_enum {
   FEMALE
   MALE
   OTHER
+}
+
+enum otp_types_enum {
+  SIGN_UP
+}
+
+type user {
+  bio: String
+  email: String!
+  gender: String
+  id: String!
+  mobile_no: String!
+  profile_url: String
+  username: String!
 }

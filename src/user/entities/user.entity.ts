@@ -1,7 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { TimeStampedCommonEntities } from 'src/common/entities';
 import { gender_enum } from 'src/common/enums';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { OtpEntity } from './otp.entity';
 
 @ObjectType('user')
 @Entity({ name: 'users' })
@@ -42,4 +43,10 @@ export class UserEntity extends TimeStampedCommonEntities {
 
     @Column({ type: 'boolean', default: false })
     verified?: boolean;
+
+    /* Relations */
+    @OneToMany(() => OtpEntity, (otpEntity) => otpEntity.user, {
+        onDelete: 'CASCADE',
+    })
+    otps?: OtpEntity;
 }

@@ -9,9 +9,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from 'src/user/entity/user.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 import { Cryptography } from 'src/common/utils/cryptography';
 import { MailModule } from 'src/mail/mail.module';
+import { OtpEntity } from 'src/user/entities/otp.entity';
 
 @Module({
     imports: [
@@ -20,7 +21,7 @@ import { MailModule } from 'src/mail/mail.module';
         JwtModule.registerAsync({
             useClass: JwtConfigService,
         }),
-        TypeOrmModule.forFeature([UserEntity]),
+        TypeOrmModule.forFeature([UserEntity, OtpEntity]),
     ],
     providers: [
         AuthResolver,
