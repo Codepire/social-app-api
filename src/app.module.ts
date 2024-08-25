@@ -9,8 +9,8 @@ import { TypeormConfigService } from './config/typeorm/typeorm.config';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { MailService } from './mail/mail.service';
 import { MailModule } from './mail/mail.module';
+import { ChatsModule } from './chats/chats.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -26,7 +26,8 @@ import configuration from './config/configuration';
         UserModule,
         AuthModule,
         MailModule,
+        ChatsModule,
     ],
-    providers: [AppService, AppResolver, MailService],
+    providers: [AppService, AppResolver],
 })
 export class AppModule {}

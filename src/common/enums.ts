@@ -11,10 +11,19 @@ export enum otp_types_enum {
     FORGOT_PASSWORD = 'forgot password',
 }
 
+export enum chat_types_enum {
+    DIRECT_MESSAGE = 'direct message',
+    GROUP = 'group',
+}
+
 registerEnumType(gender_enum, {
     name: 'gender_enum',
 });
 
 registerEnumType(otp_types_enum, {
     name: 'otp_types_enum',
+});
+
+registerEnumType(chat_types_enum, {
+    name: 'chat_types_enum',
 });
