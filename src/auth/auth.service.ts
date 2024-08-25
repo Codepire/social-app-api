@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from 'src/user/entities/user.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, DeleteResult, Repository } from 'typeorm';
 import { RegisterUserInput } from './dtos/register-user.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CONSTANTS } from 'src/common/constants';
@@ -9,6 +9,8 @@ import { Cryptography } from 'src/common/utils/cryptography';
 import { ValidateOtpInput } from './dtos/validate-otp.input';
 import { OtpEntity } from 'src/user/entities/otp.entity';
 import { otp_types_enum } from 'src/common/enums';
+import { ForgotPasswordInput } from './dtos/forgot-password.input';
+import { ResetPasswordInput } from './dtos/reset-password.input';
 
 @Injectable()
 export class AuthService {
@@ -102,31 +104,87 @@ export class AuthService {
         });
     }
 
-    async activateAccount(validateOtpInput: ValidateOtpInput) {
-        try {
-            const foundUser: UserEntity = await this.usersRepo.findOne({
-                where: {
-                    id: validateOtpInput.user_id,
-                },
-            });
-            if (!foundUser) {
-                throw new Error(CONSTANTS.USER_NOT_EXIST);
-            }
-            await this.dataSource.manager.transaction(async (transaction) => {
-                await transaction.delete(OtpEntity, {
-                    otp: validateOtpInput.otp,
-                    otp_type: validateOtpInput.otp_type,
-                    user: foundUser,
-                });
-                await transaction.update(
-                    UserEntity,
-                    { id: foundUser.id },
-                    { verified: true },
-                );
-            });
-            return 'Account activated successfully';
-        } catch (error) {
-            throw error;
+    async activateAccount(validateOtpInput: ValidateOtpInput): Promise<void> {
+        const foundUser: UserEntity = await this.usersRepo.findOne({
+            where: {
+                id: validateOtpInput.user_id,
+            },
+        });
+        if (!foundUser) {
+            throw new Error(CONSTANTS.USER_NOT_EXIST);
         }
+        await this.dataSource.manager.transaction(async (transaction) => {
+            await transaction.delete(OtpEntity, {
+                otp: validateOtpInput.otp,
+                otp_type: otp_types_enum.SIGN_UP,
+                user: foundUser,
+            });
+            await transaction.update(
+                UserEntity,
+                { id: foundUser.id },
+                { verified: true },
+            );
+        });
+    }
+
+    async forgotPassword({
+        forgotPasswordInput,
+        otp,
+    }: {
+        forgotPasswordInput: ForgotPasswordInput;
+        otp: string;
+    }): Promise<void> {
+        const foundUser: UserEntity = await this.usersRepo.findOne({
+            where: {
+                email: forgotPasswordInput.email,
+                verified: true,
+                deleted_at: null,
+            },
+        });
+
+        if (!foundUser) {
+            throw new Error(CONSTANTS.USER_NOT_EXIST);
+        }
+
+        await this.otpsRepo.save({
+            otp,
+            otp_type: otp_types_enum.FORGOT_PASSWORD,
+            user: foundUser,
+        });
+    }
+
+    async resetPassword(resetPasswordInput: ResetPasswordInput): Promise<void> {
+        const foundUser: UserEntity = await this.usersRepo.findOneBy({
+            email: resetPasswordInput.email,
+        });
+
+        if (!foundUser) {
+            throw new Error(CONSTANTS.USER_NOT_EXIST);
+        }
+
+        const { hash, salt } = await this.cryptography.hash({
+            plainText: resetPasswordInput.password,
+        });
+
+        await this.dataSource.transaction(async (transactionManager) => {
+            const deleteResult: DeleteResult = await transactionManager.delete(
+                OtpEntity,
+                {
+                    otp_type: otp_types_enum.FORGOT_PASSWORD,
+                    otp: resetPasswordInput.otp,
+                    user: foundUser,
+                } as OtpEntity,
+            );
+
+            if (deleteResult.affected === 0) {
+                throw new Error(CONSTANTS.OTP_VERIFICATION_FAILED);
+            }
+
+            await transactionManager.update(
+                UserEntity,
+                { email: resetPasswordInput.email } as UserEntity,
+                { password: hash, salt: salt } as UserEntity,
+            );
+        });
     }
 }

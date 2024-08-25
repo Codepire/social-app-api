@@ -8,6 +8,7 @@ export enum gender_enum {
 
 export enum otp_types_enum {
     SIGN_UP = 'sign up',
+    FORGOT_PASSWORD = 'forgot password',
 }
 
 registerEnumType(gender_enum, {

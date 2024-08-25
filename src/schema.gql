@@ -2,6 +2,10 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input ForgotPasswordInput {
+  email: String!
+}
+
 type GenericResult {
   message: String!
 }
@@ -16,7 +20,9 @@ type LoginUserOutput {
 }
 
 type Mutation {
+  forgotPassword(object: ForgotPasswordInput!): String!
   register(object: RegisterUserInput!): GenericResult!
+  resetPassword(object: ResetPasswordInput!): String!
   validateOtp(object: ValidateOtpInput!): String!
 }
 
@@ -37,9 +43,14 @@ input RegisterUserInput {
   username: String!
 }
 
+input ResetPasswordInput {
+  email: String!
+  otp: String!
+  password: String!
+}
+
 input ValidateOtpInput {
   otp: String!
-  otp_type: otp_types_enum!
   user_id: String!
 }
 
@@ -47,10 +58,6 @@ enum gender_enum {
   FEMALE
   MALE
   OTHER
-}
-
-enum otp_types_enum {
-  SIGN_UP
 }
 
 type user {
