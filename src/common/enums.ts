@@ -16,6 +16,11 @@ export enum chat_types_enum {
     GROUP = 'group',
 }
 
+export enum chat_user_role_types_enum {
+    ADMIN = 'admin',
+    MEMBER = 'member',
+}
+
 registerEnumType(gender_enum, {
     name: 'gender_enum',
 });
@@ -26,4 +31,8 @@ registerEnumType(otp_types_enum, {
 
 registerEnumType(chat_types_enum, {
     name: 'chat_types_enum',
+});
+
+registerEnumType(chat_user_role_types_enum, {
+    name: 'chat_user_role_types_enum',
 });

@@ -5,6 +5,8 @@ import {
     Column,
     Entity,
     JoinColumn,
+    JoinTable,
+    ManyToMany,
     ManyToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -34,4 +36,11 @@ export class ChatEntity extends TimeStampedCommonEntities {
     @ManyToOne(() => UserEntity)
     @JoinColumn({ name: 'created_by' })
     created_by: UserEntity;
+
+    @ManyToMany(() => UserEntity, (user) => user.chats)
+    @JoinTable({
+        joinColumn: { name: 'chat_id' },
+        inverseJoinColumn: { name: 'user_id' },
+    })
+    users: UserEntity[];
 }
