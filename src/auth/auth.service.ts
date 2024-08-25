@@ -84,9 +84,7 @@ export class AuthService {
         });
 
         if (foundUser) {
-            return {
-                message: CONSTANTS.USER_ALREADY_EXISTS_ERROR,
-            };
+            throw new Error(CONSTANTS.USER_ALREADY_EXISTS_ERROR);
         }
 
         const { hash, salt } = await this.cryptography.hash({
