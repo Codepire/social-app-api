@@ -13,5 +13,5 @@ export class ResetPasswordInput {
 
     @Field()
     @IsNotEmpty()
-    password: string;
+    password: string; //todo: make strong password validation
 }

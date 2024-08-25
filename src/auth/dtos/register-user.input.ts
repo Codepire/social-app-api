@@ -15,7 +15,7 @@ export class RegisterUserInput extends PartialType(UserEntity) {
 
     @Field()
     @IsNotEmpty()
-    password: string;
+    password: string; //todo: make strong password validation
 
     @Field({ nullable: true })
     bio?: string;

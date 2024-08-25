@@ -13,6 +13,8 @@ import { generateOTP } from 'src/common/utils/generate-otp';
 import { ValidateOtpInput } from './dtos/validate-otp.input';
 import { ForgotPasswordInput } from './dtos/forgot-password.input';
 import { ResetPasswordInput } from './dtos/reset-password.input';
+import { ChangePasswordInput } from './dtos/change-password.input';
+import { IUserPayload } from 'src/common/interfaces';
 
 @Resolver()
 export class AuthResolver {
@@ -75,5 +77,14 @@ export class AuthResolver {
         await this.authService.resetPassword(resetPasswordInput);
         // todo: send mail about password has been reset.
         return 'Password reset successfully';
+    }
+
+    @Mutation(() => String)
+    async changePassword(
+        @Args('object') changePasswordInput: ChangePasswordInput,
+        @CurrentUser() currentUser: IUserPayload,
+    ): Promise<string> {
+        await this.authService.changePassword(changePasswordInput, currentUser);
+        return 'Password changed.';
     }
 }

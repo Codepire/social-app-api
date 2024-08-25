@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from 'src/user/entities/user.entity';
-import { DataSource, DeleteResult, Repository } from 'typeorm';
+import { DataSource, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { RegisterUserInput } from './dtos/register-user.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CONSTANTS } from 'src/common/constants';
@@ -11,6 +11,8 @@ import { OtpEntity } from 'src/user/entities/otp.entity';
 import { otp_types_enum } from 'src/common/enums';
 import { ForgotPasswordInput } from './dtos/forgot-password.input';
 import { ResetPasswordInput } from './dtos/reset-password.input';
+import { ChangePasswordInput } from './dtos/change-password.input';
+import { IUserPayload } from 'src/common/interfaces';
 
 @Injectable()
 export class AuthService {
@@ -186,5 +188,44 @@ export class AuthService {
                 { password: hash, salt: salt } as UserEntity,
             );
         });
+    }
+
+    async changePassword(
+        changePasswordInput: ChangePasswordInput,
+        currentUser: IUserPayload,
+    ): Promise<void> {
+        const foundUser: UserEntity = await this.usersRepo.findOneBy({
+            id: currentUser.userId,
+            deleted_at: null,
+            verified: true,
+        });
+
+        if (!foundUser) {
+            throw new Error(CONSTANTS.USER_NOT_EXIST);
+        }
+
+        if (
+            !(await this.cryptography.compare({
+                plainText: changePasswordInput.old_password,
+                hash: foundUser.password,
+                salt: foundUser.salt,
+            }))
+        ) {
+            throw new Error(CONSTANTS.WRONG_PASSWORD);
+        } else {
+            const { hash, salt } = await this.cryptography.hash({
+                plainText: changePasswordInput.new_password,
+            });
+            const updateResult: UpdateResult = await this.usersRepo
+                .createQueryBuilder('user')
+                .update()
+                .where('id = :id', { id: foundUser.id })
+                .set({ password: hash, salt })
+                .execute();
+
+            if (updateResult.affected === 0) {
+                throw new Error(CONSTANTS.SOMETHING_WENT_WRONG_ERROR);
+            }
+        }
     }
 }

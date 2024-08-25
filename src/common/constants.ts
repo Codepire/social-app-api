@@ -4,4 +4,5 @@ export enum CONSTANTS {
     SOMETHING_WENT_WRONG_ERROR = 'Something went wrong!',
     USER_NOT_EXIST = 'User does not exist',
     OTP_VERIFICATION_FAILED = 'OTP verification failed',
+    WRONG_PASSWORD = 'Wrong password',
 }
