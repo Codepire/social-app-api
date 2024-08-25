@@ -7,6 +7,13 @@ input ChangePasswordInput {
   old_password: String!
 }
 
+input CreateChatInput {
+  bio: String
+  name: String
+  profile_url: String
+  type: String
+}
+
 input ForgotPasswordInput {
   email: String!
 }
@@ -26,6 +33,7 @@ type LoginUserOutput {
 
 type Mutation {
   changePassword(object: ChangePasswordInput!): String!
+  createChat(object: CreateChatInput!): GenericResult!
   forgotPassword(object: ForgotPasswordInput!): String!
   register(object: RegisterUserInput!): GenericResult!
   resetPassword(object: ResetPasswordInput!): String!
