@@ -5,11 +5,11 @@ import {
     Column,
     Entity,
     JoinColumn,
-    JoinTable,
-    ManyToMany,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ChatUserMapping } from './chats-users-mapping.entity';
 
 @Entity({ name: 'chats' })
 export class ChatEntity extends TimeStampedCommonEntities {
@@ -37,10 +37,6 @@ export class ChatEntity extends TimeStampedCommonEntities {
     @JoinColumn({ name: 'created_by' })
     created_by: UserEntity;
 
-    @ManyToMany(() => UserEntity, (user) => user.chats)
-    @JoinTable({
-        joinColumn: { name: 'chat_id' },
-        inverseJoinColumn: { name: 'user_id' },
-    })
-    users: UserEntity[];
+    @OneToMany(() => ChatUserMapping, (chatUserMapping) => chatUserMapping.chat)
+    chat_user_mapping: ChatUserMapping[];
 }

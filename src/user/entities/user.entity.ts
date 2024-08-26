@@ -1,15 +1,9 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { TimeStampedCommonEntities } from 'src/common/entities';
 import { gender_enum } from 'src/common/enums';
-import {
-    Column,
-    Entity,
-    ManyToMany,
-    OneToMany,
-    PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { OtpEntity } from './otp.entity';
-import { ChatEntity } from 'src/chats/entities/chat.entity';
+import { ChatUserMapping } from 'src/chats/entities/chats-users-mapping.entity';
 
 @ObjectType('user')
 @Entity({ name: 'users' })
@@ -52,11 +46,9 @@ export class UserEntity extends TimeStampedCommonEntities {
     verified?: boolean;
 
     /* Relations */
-    @OneToMany(() => OtpEntity, (otpEntity) => otpEntity.user, {
-        onDelete: 'CASCADE',
-    })
+    @OneToMany(() => OtpEntity, (otpEntity) => otpEntity.user)
     otps?: OtpEntity;
 
-    @ManyToMany(() => ChatEntity, (chat) => chat.users)
-    chats: ChatEntity[];
+    @OneToMany(() => ChatUserMapping, (chatUserMapping) => chatUserMapping.user)
+    chat_user_mapping: ChatUserMapping[];
 }

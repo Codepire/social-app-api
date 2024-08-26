@@ -31,7 +31,9 @@ export class OtpEntity {
 
     /* Relations */
     @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (user) => user.otps)
+    @ManyToOne(() => UserEntity, (user) => user.otps, {
+        onDelete: 'CASCADE',
+    })
     @JoinColumn({ name: 'user_id' })
     user: UserEntity;
 }
