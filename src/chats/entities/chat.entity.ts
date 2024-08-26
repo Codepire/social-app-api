@@ -37,6 +37,10 @@ export class ChatEntity extends TimeStampedCommonEntities {
     @JoinColumn({ name: 'created_by' })
     created_by: UserEntity;
 
-    @OneToMany(() => ChatUserMapping, (chatUserMapping) => chatUserMapping.chat)
+    @OneToMany(
+        () => ChatUserMapping,
+        (chatUserMapping) => chatUserMapping.chat,
+        { cascade: true },
+    )
     chat_user_mapping: ChatUserMapping[];
 }

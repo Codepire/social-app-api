@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { IUserPayload } from 'src/common/interfaces';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { CONSTANTS } from 'src/common/constants';
+import { chat_user_role_types_enum } from 'src/common/enums';
 
 @Injectable()
 export class ChatsService {
@@ -31,10 +32,15 @@ export class ChatsService {
         if (!foundUser) {
             throw new Error(CONSTANTS.USER_NOT_EXIST);
         }
-
-        await this.chatsRepo.insert({
+        await this.chatsRepo.save({
             ...createChatInput,
             created_by: foundUser,
+            chat_user_mapping: [
+                {
+                    role: chat_user_role_types_enum.ADMIN,
+                    user: foundUser,
+                },
+            ],
         });
     }
 }

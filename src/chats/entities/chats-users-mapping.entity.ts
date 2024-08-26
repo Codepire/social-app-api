@@ -19,7 +19,9 @@ export class ChatUserMapping extends TimeStampedCommonEntities {
     @JoinColumn({ name: 'user_id' })
     user: UserEntity;
 
-    @ManyToOne(() => ChatEntity, (userEntity) => userEntity.chat_user_mapping)
+    @ManyToOne(() => ChatEntity, (userEntity) => userEntity.chat_user_mapping, {
+        onDelete: 'CASCADE',
+    })
     @JoinColumn({ name: 'chat_id' })
     chat: ChatEntity;
 
